@@ -2,7 +2,10 @@
 Package converts sparse graph matrix to PyTorch model
 
 # Still working on code refactoring and documentation
-- [reference for documentation : sentencepiece](https://github.com/google/sentencepiece)
+
+## References for documentation
+- [pytorch-lightning](https://github.com/williamFalcon/pytorch-lightning)
+- [sentencepiece](https://github.com/google/sentencepiece)
 
 # Installation
 
