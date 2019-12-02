@@ -5,7 +5,9 @@ Package converts sparse graph matrix to PyTorch model
 
 ## References for documentation
 - [pytorch-lightning](https://github.com/williamFalcon/pytorch-lightning)
+    - [raw](https://raw.githubusercontent.com/williamFalcon/pytorch-lightning/master/README.md)
 - [sentencepiece](https://github.com/google/sentencepiece)
+    - [raw](https://raw.githubusercontent.com/google/sentencepiece/master/README.md)
 
 # Installation
 
