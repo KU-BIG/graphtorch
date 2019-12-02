@@ -1,4 +1,3 @@
-
 #import modules needed  
 import numpy as np
 import torch 
@@ -11,7 +10,6 @@ import torch.nn as nn
 # 2: ReLU
 # 3: sigmoid
 '''
-activations = [None, None, nn.ReLU(), nn.Sigmoid()]    
 
 #class for matrix information 
 
@@ -70,11 +68,9 @@ class MatrixForWANN():
     
     
 # wrapping activation function
-# initialize constant_weight and bias  
+# initialize constant_weight and bias    
 
-constant_weight = 1 #py 밖에서 따로 선언해주기   
-
-def wrap_activation(x, idx_activation, activations) :    
+def wrap_activation(x, idx_activation, activations, constant_weight) :    
     if idx_activation == 0 :
         assert True
     elif idx_activation == 1 :
@@ -94,7 +90,7 @@ def wrap_activation(x, idx_activation, activations) :
 
 
 class WANNFCN(nn.Module) : 
-    def __init__(self, mat_wann, activations) : 
+    def __init__(self, mat_wann, activations, constant_weight) : 
         super(WANNFCN, self).__init__()
         self.mat = mat_wann.mat
         self.in_dim = mat_wann.in_dim
@@ -103,6 +99,7 @@ class WANNFCN(nn.Module) :
         self.hidden_dim = mat_wann.hidden_dim
         
         self.activations = activations
+        self.constant_weight = constant_weight
         
         self.nodes = {}
         '''
@@ -158,11 +155,11 @@ class WANNFCN(nn.Module) :
                     for idx_input_col, activation_type in enumerate(connections_from_input): 
                         
                         if activation_type != 0 and count_connection == 0:  
-                            input_node = wrap_activation(x[:, idx_input_col].view(-1,1), activation_type, activations)
+                            input_node = wrap_activation(x[:, idx_input_col].view(-1,1), activation_type, self.activations, self.constant_weight)
                             count_connection += 1
                         elif activation_type != 0 and count_connection != 0 :   
                             new_node = None
-                            new_node = wrap_activation(x[:, idx_input_col].view(-1,1), activation_type, activations)  
+                            new_node = wrap_activation(x[:, idx_input_col].view(-1,1), activation_type, self.activations, self.constant_weight)  
                             count_connection += 1
                             input_node = input_node + new_node  
                         
@@ -189,10 +186,10 @@ class WANNFCN(nn.Module) :
 
                             # 1) idx_input_col 이 input에서 오는 경우
                             if idx_input_col < self.in_dim : 
-                                input_node = wrap_activation(x[:, idx_input_col].view(-1, 1), activation_type, activations)
+                                input_node = wrap_activation(x[:, idx_input_col].view(-1, 1), activation_type, self.activations, self.constant_weight)
                             # 2) idx_input_col이 hidden에서 오는 경우
                             elif idx_input_col >= self.in_dim : 
-                                input_node = wrap_activation(self.nodes['hidden_%d'%(idx_input_col-self.in_dim)], activation_type, activations)
+                                input_node = wrap_activation(self.nodes['hidden_%d'%(idx_input_col-self.in_dim)], activation_type, self.activations, self.constant_weight)
 
                             print(input_node)
                             count_connection += 1
@@ -209,10 +206,10 @@ class WANNFCN(nn.Module) :
                             new_node = None
                             # 1) idx_input_col 이 input에서 오는 경우
                             if idx_input_col < self.in_dim : 
-                                new_node = wrap_activation(x[:, idx_input_col].view(-1, 1), activation_type, activations)
+                                new_node = wrap_activation(x[:, idx_input_col].view(-1, 1), activation_type, self.activations, self.constant_weight)
                             # 2) idx_input_col이 hidden에서 오는 경우
                             elif idx_input_col >= self.in_dim : 
-                                new_node = wrap_activation(self.nodes['hidden_%d'%(idx_input_col-self.in_dim)], activation_type, activations)
+                                new_node = wrap_activation(self.nodes['hidden_%d'%(idx_input_col-self.in_dim)], activation_type, self.activations, self.constant_weight)
 
 
 
