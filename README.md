@@ -18,7 +18,7 @@ not uploaded yet
 # Examples
 
 ## Create sparse matrix with essential impormation
-```
+```python
 from graphtorch import SpraseMatrix
 
 mat1 = np.array([[0,2,0,0,2,0,0,0,0,0],
@@ -34,7 +34,7 @@ mat_wann1 = SparseMatrix(mat1, in_dim, out_dim)
 ```
 
 ## Create sparse torch model with SparseMatrix
-```
+```python
 from graphtorch import SparseModel
 
 activations = [None, None, nn.ReLU(), nn.Sigmoid()]  
@@ -53,7 +53,7 @@ output, nodes = model(numpy_input)
 ## output
 
 
-```  
+```python
 tensor([[1.0000, 1.0000],
         [1.0000, 1.0000],
         [1.0000, 1.0000]], grad_fn=<CatBackward>)
@@ -61,7 +61,7 @@ tensor([[1.0000, 1.0000],
  
 ## nodes
 
-```  
+```python
 {'hidden_0': tensor([[ 7.],
          [17.],
          [27.]], grad_fn=<AddBackward0>), 'hidden_1': tensor([[ 4.],
