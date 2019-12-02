@@ -4,8 +4,7 @@ import torch
 import torch.nn as nn
 
 #class for matrix information 
-
-class MatrixForWANN():
+class SparseMatrix():
     
     def __init__(self, mat, in_dim, out_dim):
         # get when initialized
@@ -61,7 +60,6 @@ class MatrixForWANN():
     
 # wrapping activation function
 # initialize constant_weight and bias    
-
 def wrap_activation(x, idx_activation, activations, constant_weight) :    
     if idx_activation == 0 :
         assert True
@@ -79,11 +77,9 @@ def wrap_activation(x, idx_activation, activations, constant_weight) :
 # without hidden layer counts  
 # search for all nodes connected to current node using dictionary of nodes  
 # connecting and forward propagation simultaneously 
-
-
-class WANNFCN(nn.Module) : 
+class SparseModel(nn.Module) : 
     def __init__(self, mat_wann, activations, constant_weight) : 
-        super(WANNFCN, self).__init__()
+        super(SparseModel, self).__init__()
         self.mat = mat_wann.mat
         self.in_dim = mat_wann.in_dim
         self.out_dim = mat_wann.out_dim
@@ -110,9 +106,8 @@ class WANNFCN(nn.Module) :
         
         # output은 반드시 있음
         outputs = self.concat_output()
-        print(self.nodes)
         
-        return outputs
+        return outputs, self.nodes
     
     def concat_output(self) :
         for idx_output_node in list(range(self.out_dim)) :
