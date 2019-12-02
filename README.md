@@ -80,3 +80,7 @@ tensor([[1.0000, 1.0000],
          [1.0000],
          [1.0000]], grad_fn=<SigmoidBackward>)}
 ```
+
+## Mainatiner
+- Sehee Lee (?@?)
+- Hyeonwoo Yoo (hyeon95y@gmail.com)
