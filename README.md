@@ -11,6 +11,7 @@ not uploaded yet
 
 # Examples
 
+## Create sparse matrix with essential impormation
 ```
 from graphtorch import SpraseMatrix
 
@@ -26,6 +27,7 @@ out_dim = 2
 mat_wann1 = SparseMatrix(mat1, in_dim, out_dim)   
 ```
 
+## Create sparse torch model with SparseMatrix
 ```
 from graphtorch import SparseModel
 
@@ -42,7 +44,7 @@ output, nodes = model(numpy_input)
 ```
 
 
-output
+## output
 
 
 ```  
@@ -51,7 +53,7 @@ tensor([[1.0000, 1.0000],
         [1.0000, 1.0000]], grad_fn=<CatBackward>)
 ```
  
-nodes
+## nodes
 
 ```  
 {'hidden_0': tensor([[ 7.],
