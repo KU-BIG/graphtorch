@@ -3,14 +3,6 @@ import numpy as np
 import torch 
 import torch.nn as nn
 
-# declare activation types   
-'''
-# 0: not connected
-# 1: linear
-# 2: ReLU
-# 3: sigmoid
-'''
-
 #class for matrix information 
 
 class MatrixForWANN():
@@ -124,8 +116,8 @@ class WANNFCN(nn.Module) :
     
     def concat_output(self) :
         for idx_output_node in list(range(self.out_dim)) :
-            print('output %d' %idx_output_node)
-            print(self.nodes['output_%d'%idx_output_node])
+            #print('output %d' %idx_output_node)
+            #print(self.nodes['output_%d'%idx_output_node])
             if idx_output_node == 0 :
                 outputs = self.nodes['output_%d'%idx_output_node]
             else : 
@@ -137,7 +129,7 @@ class WANNFCN(nn.Module) :
         # input layer와 모든 이전 hidden layer를 탐색
         # 그렇지 않으면 skip connection을 놓칠수 있음
         # 모든 node와 connection은 dictionary self.nodes에 저장
-        print(self.hidden_dim)
+        #print(self.hidden_dim)
         hidden_node_counts = 0
         
         
@@ -173,16 +165,16 @@ class WANNFCN(nn.Module) :
             for idx_hidden_row in list(range(0, self.mat.shape[0])) :   
                 #connections_from_input = self.mat[idx_hidden_row, :self.in_dim]
                 connections_from_input = self.mat[idx_hidden_row, :]
-                print('connection from input : ', connections_from_input)
+                #print('connection from input : ', connections_from_input)
                 if connections_from_input.sum() != 0 :  
                     count_connection = 0   
                     input_node = None   
                     ############################# loop for input nodes
                     for idx_input_col, activation_type in enumerate(connections_from_input) :
-                        print('idx_input_col %s, activation_type %s' % (idx_input_col, activation_type))
+                        #print('idx_input_col %s, activation_type %s' % (idx_input_col, activation_type))
                         if activation_type != 0 and count_connection == 0:
                             # x[sample index, positional index for input]
-                            print('\n**first input node')
+                            #print('\n**first input node')
 
                             # 1) idx_input_col 이 input에서 오는 경우
                             if idx_input_col < self.in_dim : 
@@ -191,15 +183,15 @@ class WANNFCN(nn.Module) :
                             elif idx_input_col >= self.in_dim : 
                                 input_node = wrap_activation(self.nodes['hidden_%d'%(idx_input_col-self.in_dim)], activation_type, self.activations, self.constant_weight)
 
-                            print(input_node)
+                            #print(input_node)
                             count_connection += 1
                         elif activation_type != 0 and count_connection != 0 :
-                            print('%s input node' % idx_input_col)
+                            #print('%s input node' % idx_input_col)
                             # x[sample index, positional index for input]
                             # torch.sum returns the addition of two tensors
 
-                            print('\n**input_node', input_node.shape)
-                            print(input_node)
+                            #print('\n**input_node', input_node.shape)
+                            #print(input_node)
 
                             #new_node = wrap_activation(x[:, idx_input_col].view(-1, 1), activation_type, activations)
 
@@ -213,11 +205,11 @@ class WANNFCN(nn.Module) :
 
 
 
-                            print('\n**wrap_activation', new_node.shape)
-                            print(new_node)
+                            #print('\n**wrap_activation', new_node.shape)
+                            #print(new_node)
                             input_node = input_node + new_node
-                            print('\n**sum', input_node.shape)
-                            print(input_node)
+                            #print('\n**sum', input_node.shape)
+                            #print(input_node)
 
 
                             #input_node = torch.sum(input_node, wrap_activation(x[:, idx_input_col].view(-1, 1), activation_type, activations))
