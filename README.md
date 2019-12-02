@@ -1,15 +1,15 @@
 # graphtorch
 Package converts sparse graph matrix to PyTorch model
 
-# Still working on code refactoring and documentation
+## Still working on code refactoring and documentation
 
-## References for documentation
+### References for documentation
 - [pytorch-lightning](https://github.com/williamFalcon/pytorch-lightning)
     - [raw](https://raw.githubusercontent.com/williamFalcon/pytorch-lightning/master/README.md)
 - [sentencepiece](https://github.com/google/sentencepiece)
     - [raw](https://raw.githubusercontent.com/google/sentencepiece/master/README.md)
 
-# Installation
+## Installation
 
 ```
 pip install graphtorch
@@ -17,9 +17,9 @@ pip install graphtorch
 
 not uploaded yet
 
-# Examples
+## Examples
 
-## Create sparse matrix with essential impormation
+### Create sparse matrix with essential impormation
 ```python
 from graphtorch import SpraseMatrix
 
@@ -35,7 +35,7 @@ out_dim = 2
 mat_wann1 = SparseMatrix(mat1, in_dim, out_dim)   
 ```
 
-## Create sparse torch model with SparseMatrix
+### Create sparse torch model with SparseMatrix
 ```python
 from graphtorch import SparseModel
 
@@ -52,7 +52,7 @@ output, nodes = model(numpy_input)
 ```
 
 
-## output
+### output
 
 
 ```python
@@ -61,7 +61,7 @@ tensor([[1.0000, 1.0000],
         [1.0000, 1.0000]], grad_fn=<CatBackward>)
 ```
  
-## nodes
+### nodes
 
 ```python
 {'hidden_0': tensor([[ 7.],
