@@ -81,6 +81,6 @@ tensor([[1.0000, 1.0000],
          [1.0000]], grad_fn=<SigmoidBackward>)}
 ```
 
-## Mainatiner
+## Maintainer
 - Sehee Lee (lsh9382@gmail.com / lsh9382@korea.ac.kr)     
 - Hyeonwoo Yoo (hyeon95y@gmail.com)    
