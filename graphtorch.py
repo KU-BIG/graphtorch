@@ -62,16 +62,16 @@ class SparseMatrix():
     
 # wrapping activation function
 # initialize constant_weight and bias    
-def wrap_activation(layer, x, idx_activation, activations, constant_weight) :    
+def wrap_activation(layer, x, idx_activation, activations) :    
     if idx_activation == 0 :
         assert True
     elif idx_activation == 1 :
         #layer = self.linears(total_connection_counts)
-        layer.weight.data.fill_(constant_weight)
+        #layer.weight.data.fill_(constant_weight)
         return layer(x)
     else : 
         #layer = self.linears(total_connection_counts)
-        layer.weight.data.fill_(constant_weight)
+        #layer.weight.data.fill_(constant_weight)
         return activations[idx_activation](layer(x))
     
     
@@ -89,7 +89,7 @@ class SparseModel(nn.Module) :
         self.hidden_dim = mat_wann.hidden_dim
         
         self.activations = activations
-        self.constant_weight = constant_weight
+        #self.constant_weight = constant_weight
         
         self.nodes = {}
         '''
@@ -105,7 +105,15 @@ class SparseModel(nn.Module) :
         # Reference
         # https://discuss.pytorch.org/t/when-should-i-use-nn-modulelist-and-when-should-i-use-nn-sequential/5463/2
         # https://pytorch.org/docs/stable/nn.html
-        self.linears = nn.ModuleList([nn.Linear(1, 1, bias=False) for i in range(0, self.connection_count)])
+        #self.linears = nn.ModuleList([nn.Linear(1, 1, bias=False) for i in range(0, self.connection_count)])
+        
+        layer = nn.Linear(1, 1, bias=False)
+        layer.weight.data.fill_(constant_weight)
+        self.linears = nn.ModuleList([layer])
+        for i in range(0, self.connection_count) : 
+            layer = nn.Linear(1, 1, bias=False)
+            layer.weight.data.fill_(constant_weight)
+            self.linears.append(layer)
 
         
     def forward(self, x) : 
@@ -152,13 +160,13 @@ class SparseModel(nn.Module) :
                         
                         if activation_type != 0 and count_connection == 0:  
                             layer = self.linears[total_connection_counts]
-                            input_node = wrap_activation(layer, x[:, idx_input_col].view(-1,1), activation_type, self.activations, self.constant_weight)
+                            input_node = wrap_activation(layer, x[:, idx_input_col].view(-1,1), activation_type, self.activations)
                             count_connection += 1
                             total_connection_counts += 1
                         elif activation_type != 0 and count_connection != 0 :   
                             new_node = None
                             layer = self.linears[total_connection_counts]
-                            new_node = wrap_activation(layer, x[:, idx_input_col].view(-1,1), activation_type, self.activations, self.constant_weight)  
+                            new_node = wrap_activation(layer, x[:, idx_input_col].view(-1,1), activation_type, self.activations)  
                             count_connection += 1
                             total_connection_counts += 1
                             input_node = input_node + new_node  
@@ -188,16 +196,14 @@ class SparseModel(nn.Module) :
                                 layer = self.linears[total_connection_counts]
                                 input_node = wrap_activation(layer, x[:, idx_input_col].view(-1, 1), 
                                                              activation_type, 
-                                                             self.activations, 
-                                                             self.constant_weight)
+                                                             self.activations)
                                 total_connection_counts += 1
                             # 2) idx_input_col이 hidden에서 오는 경우
                             elif idx_input_col >= self.in_dim : 
                                 layer = self.linears[total_connection_counts]
                                 input_node = wrap_activation(layer, self.nodes['hidden_%d'%(idx_input_col-self.in_dim)],
                                                              activation_type, 
-                                                             self.activations, 
-                                                             self.constant_weight)
+                                                             self.activations)
                                 total_connection_counts += 1
 
                             #print(input_node)
@@ -211,8 +217,7 @@ class SparseModel(nn.Module) :
                                 layer = self.linears[total_connection_counts]
                                 new_node = wrap_activation(layer, x[:, idx_input_col].view(-1, 1), 
                                                            activation_type, 
-                                                           self.activations, 
-                                                           self.constant_weight)
+                                                           self.activations)
                                 total_connection_counts += 1
                                 
                             # 2) idx_input_col이 hidden에서 오는 경우
@@ -220,8 +225,7 @@ class SparseModel(nn.Module) :
                                 layer = self.linears[total_connection_counts]
                                 new_node = wrap_activation(layer, self.nodes['hidden_%d'%(idx_input_col-self.in_dim)],
                                                            activation_type,
-                                                           self.activations,
-                                                           self.constant_weight)
+                                                           self.activations)
                                 total_connection_counts += 1
 
                             input_node = input_node + new_node
