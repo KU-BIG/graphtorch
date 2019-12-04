@@ -66,12 +66,8 @@ def wrap_activation(layer, x, idx_activation, activations) :
     if idx_activation == 0 :
         assert True
     elif idx_activation == 1 :
-        #layer = self.linears(total_connection_counts)
-        #layer.weight.data.fill_(constant_weight)
         return layer(x)
     else : 
-        #layer = self.linears(total_connection_counts)
-        #layer.weight.data.fill_(constant_weight)
         return activations[idx_activation](layer(x))
     
     
@@ -160,13 +156,19 @@ class SparseModel(nn.Module) :
                         
                         if activation_type != 0 and count_connection == 0:  
                             layer = self.linears[total_connection_counts]
-                            input_node = wrap_activation(layer, x[:, idx_input_col].view(-1,1), activation_type, self.activations)
+                            input_node = wrap_activation(layer, 
+                                                         x[:, idx_input_col].view(-1,1), 
+                                                         activation_type, 
+                                                         self.activations)
                             count_connection += 1
                             total_connection_counts += 1
                         elif activation_type != 0 and count_connection != 0 :   
                             new_node = None
                             layer = self.linears[total_connection_counts]
-                            new_node = wrap_activation(layer, x[:, idx_input_col].view(-1,1), activation_type, self.activations)  
+                            new_node = wrap_activation(layer, 
+                                                       x[:, idx_input_col].view(-1,1), 
+                                                       activation_type, 
+                                                       self.activations)  
                             count_connection += 1
                             total_connection_counts += 1
                             input_node = input_node + new_node  
