@@ -76,7 +76,7 @@ def wrap_activation(layer, x, idx_activation, activations) :
 # search for all nodes connected to current node using dictionary of nodes  
 # connecting and forward propagation simultaneously 
 class SparseModel(nn.Module) : 
-    def __init__(self, mat_wann, activations, constant_weight) : 
+    def __init__(self, mat_wann, activations, constant_weight, output_activation) : 
         super(SparseModel, self).__init__()
         self.mat = mat_wann.mat
         self.in_dim = mat_wann.in_dim
@@ -85,6 +85,7 @@ class SparseModel(nn.Module) :
         self.hidden_dim = mat_wann.hidden_dim
         
         self.activations = activations
+        self.output_activation = activation
         #self.constant_weight = constant_weight
         
         self.nodes = {}
@@ -130,7 +131,7 @@ class SparseModel(nn.Module) :
             else : 
                 outputs = torch.cat((outputs, self.nodes['output_%d'%idx_output_node]), 1)
         
-        return outputs
+        return output_activation(outputs)
     
     def connect(self, x) : 
         # input layer와 모든 이전 hidden layer를 탐색
