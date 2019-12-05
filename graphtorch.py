@@ -76,7 +76,7 @@ def wrap_activation(layer, x, idx_activation, activations) :
 # search for all nodes connected to current node using dictionary of nodes  
 # connecting and forward propagation simultaneously 
 class SparseModel(nn.Module) : 
-    def __init__(self, mat_wann, activations, constant_weight) : 
+    def __init__(self, mat_wann, activations, constant_weight, output_activation) : 
         super(SparseModel, self).__init__()
         self.mat = mat_wann.mat
         self.in_dim = mat_wann.in_dim
@@ -85,6 +85,7 @@ class SparseModel(nn.Module) :
         self.hidden_dim = mat_wann.hidden_dim
         
         self.activations = activations
+        self.output_activation = output_activation
         #self.constant_weight = constant_weight
         
         self.nodes = {}
@@ -130,7 +131,7 @@ class SparseModel(nn.Module) :
             else : 
                 outputs = torch.cat((outputs, self.nodes['output_%d'%idx_output_node]), 1)
         
-        return outputs
+        return self.output_activation(outputs)
     
     def connect(self, x) : 
         # input layer와 모든 이전 hidden layer를 탐색
@@ -172,8 +173,11 @@ class SparseModel(nn.Module) :
                             count_connection += 1
                             total_connection_counts += 1
                             input_node = input_node + new_node  
-                        
-                self.nodes['output_%d'%(idx_output_row)] = input_node  
+                 
+                    self.nodes['output_%d'%(idx_output_row)] = input_node  
+                    
+                else : # connection이 없어도 ouput node는 존재해야 함. 그 값은 0
+                    self.nodes['output_%d'%(idx_output_row)] = torch.zeros((x.shape[0], 1), requires_grad=True)
             
             
         
@@ -234,13 +238,13 @@ class SparseModel(nn.Module) :
 
                             count_connection += 1
                             
-                # connect all input nodes to given hidden node
-                if idx_hidden_row < self.num_hidden_nodes : 
-                    self.nodes['hidden_%d'%idx_hidden_row] = input_node 
-                else : 
-                    self.nodes['output_%d'%(idx_hidden_row-self.num_hidden_nodes)] = input_node    
+                    # connect all input nodes to given hidden node
+                    if idx_hidden_row < self.num_hidden_nodes : 
+                        self.nodes['hidden_%d'%idx_hidden_row] = input_node 
+                    else : 
+                        self.nodes['output_%d'%(idx_hidden_row-self.num_hidden_nodes)] = input_node    
+                else : # connection이 없어도 ouput node는 존재해야 함. 그 값은 0
+                    if idx_hidden_row >= self.num_hidden_nodes : 
+                        self.nodes['output_%d'%(idx_hidden_row-self.num_hidden_nodes)] = torch.zeros((x.shape[0],1), requirs_grad=True) 
             # sum all numbers of hidden nodes from this layer      
             hidden_node_counts += 1     
-
-            
-            
