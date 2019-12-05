@@ -1,14 +1,6 @@
 # graphtorch
 Package converts sparse graph matrix to PyTorch model
 
-## Still working on code refactoring and documentation
-
-### References for documentation
-- [pytorch-lightning](https://github.com/williamFalcon/pytorch-lightning)
-    - [raw](https://raw.githubusercontent.com/williamFalcon/pytorch-lightning/master/README.md)
-- [sentencepiece](https://github.com/google/sentencepiece)
-    - [raw](https://raw.githubusercontent.com/google/sentencepiece/master/README.md)
-
 ## Installation
 
 ```
@@ -84,3 +76,16 @@ tensor([[1.0000, 1.0000],
 ## Maintainer
 - Sehee Lee (lsh9382@gmail.com / lsh9382@korea.ac.kr)     
 - Hyeonwoo Yoo (hyeon95y@gmail.com)    
+
+---- 
+
+# Draft
+
+## Still working on code refactoring and documentation
+
+### References for documentation
+- [pytorch-lightning](https://github.com/williamFalcon/pytorch-lightning)
+    - [raw](https://raw.githubusercontent.com/williamFalcon/pytorch-lightning/master/README.md)
+- [sentencepiece](https://github.com/google/sentencepiece)
+    - [raw](https://raw.githubusercontent.com/google/sentencepiece/master/README.md)
+
