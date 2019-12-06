@@ -9,7 +9,7 @@ pip install graphtorch
 
 not uploaded yet
 
-## Examples
+## [Examples](https://github.com/KU-BIG/graphtorch/blob/master/example.ipynb)
 
 ### Create sparse matrix with essential impormation
 ```python
