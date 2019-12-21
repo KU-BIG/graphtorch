@@ -1,6 +1,8 @@
 # How to upload pypi?
 
-## Refernces
+## How to
+
+## References
 
 - [파이썬 코딩도장 : 45.3 패키지 만들기](https://dojang.io/mod/page/view.php?id=2449)
 - [TroubleShooting : Keyring error](https://stackoverflow.com/questions/53164278/missing-dependencies-causing-keyring-error-when-opening-spyder3-on-ubuntu18)
