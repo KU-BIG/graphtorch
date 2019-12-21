@@ -1,4 +1,4 @@
-# How to upload pypi?
+# How to upload graphtorch to pypi?
 
 ## How to
 
@@ -15,7 +15,6 @@ from grpahtorch.matrix import SparseMatrix
 - 아래와 같이 **[graphtorch] 폴더 밖에(같은 디렉토리에)** setup.py 파일을 생성
 ```python
 from setuptools import setup, find_packages
-
 
 setup(
     name             = 'graphtorch',
@@ -68,7 +67,7 @@ pip3 install wheel
 pip3 install twine
 ```
 
-- referneces를 따라하는 와중에 아래 패키지 에러가 나서 추가로 업데이트해주었음
+- references를 따라하는 와중에 아래 패키지 에러가 나서 추가로 업데이트해주었음
 ```
 pip3 install --upgrade keyrings.alt
 ```
