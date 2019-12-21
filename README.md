@@ -2,7 +2,7 @@
 
 ## How to
 
-- [graphtorch] 폴더안에 __init__.py 를 생성
+- [graphtorch] 폴더안에 \__init__.py 를 생성
   - 빈 파일이도 상관없음, 폴더를 패키지로 인식하게 해주는 역할
 - 현재 graphtorch 폴더안에느 아래와 같은 .py 파일이 존재함
   - matrix.py
@@ -50,10 +50,22 @@ include README.md
 필요 내용 작성
 ```
 
+- 위와 같은 내용을 수행하였으며, 아래와 같은 디렉토리 구조가 됨
+
+- 상위 폴더
+  - graphtorch(폴더)
+    - \__init__.py
+    - matrix.py
+    - model.py
+  - setup.py
+  - setup.cfg
+  - MENIFEST.in
+  - README.md
 
 - 업로드에 필요한 패키지 설치
 ```
 pip3 install wheel
+pip3 install twine
 ```
 
 - referneces를 따라하는 와중에 아래 패키지 에러가 나서 추가로 업데이트해주었음
