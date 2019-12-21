@@ -32,11 +32,16 @@ class SparseMatrix():
         out_dim = self.out_dim
         mat_mask = self.mat
         
-        hidden_dim_list = []
+        hidden_dim_list = [] 
         start_col_idx = 0
         finish_col_idx = in_dim -1   
         
+        
         while(True):
+            print("start_col_idx:{}".format(start_col_idx))  
+            print("finish_col_idx:{}".format(finish_col_idx))   
+            print(hidden_dim_list)  
+            
             
             if finish_col_idx >= mat_mask.shape[1]:   
                 print(finish_col_idx)
@@ -45,10 +50,17 @@ class SparseMatrix():
             if ((mat_mask.shape[0] - sum(hidden_dim_list)) == out_dim):  #example4 해결
                  break  #지금 hidden dimension들 합이랑 output dim 합이 row길이랑 같으면 더이상 탐색 필요 x
             
+            if self.num_hidden_nodes >= 1:
+                if (mat_mask[in_dim:,0:self.num_hidden_nodes].sum() == 0):
+                    hidden_dim_list = [self.num_hidden_nodes]
+                    break 
+            
+            
             for i in range(sum(hidden_dim_list), len(mat_mask)): #이부분이상한데..?   
     
                 #밑에처럼 하면 example 2에서 오류가 남.
-                #skip connection에 대한 예외처리 해줘야 함   
+                #skip connection에 대한 예외처리 해줘야 함
+                
                 if(mat_mask[i,start_col_idx:(finish_col_idx + 1)].sum() == 0):   
                 
                     hidden_dim = i - sum(hidden_dim_list)
@@ -56,6 +68,8 @@ class SparseMatrix():
                     start_col_idx = finish_col_idx + 1
                     finish_col_idx += hidden_dim   
                     break    
+            
+                
                     
         return hidden_dim_list     
     
