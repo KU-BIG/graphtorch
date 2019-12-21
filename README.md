@@ -7,8 +7,6 @@ Package converts sparse graph matrix to PyTorch model
 pip install graphtorch
 ```
 
-not uploaded yet
-
 ## [Examples](https://github.com/KU-BIG/graphtorch/blob/master/example.ipynb)
 
 ### Create sparse matrix with essential impormation
