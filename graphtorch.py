@@ -237,11 +237,12 @@ class SparseNodeMatrix():
         
             
         
-def node_activation(layer, x, idx_activation):    
-        if idx_activation == 0:  
-            assert True  
-        elif idx_activation == 1:  
-            return layer(x)    
+def node_activation(layer, x, idx_activation, activation_list):    
+    if idx_activation == 0:  
+        return layer(x) 
+    else: 
+        return activation_list[idx_activation](layer(x))     
+      
 
 def none_or_tensor(x) : 
     try :
@@ -253,7 +254,7 @@ def none_or_tensor(x) :
 
 class SparseNodeModel(nn.Module) :   
     
-    def __init__(self, mat_wann, activations, constant_weight, activation_list) : 
+    def __init__(self, mat_wann, activation_list, constant_weight, activation_output) : 
         super(SparseNodeModel, self).__init__()       
         self.mat = mat_wann.mat
         self.in_dim = mat_wann.in_dim
@@ -261,8 +262,10 @@ class SparseNodeModel(nn.Module) :
         self.num_hidden_nodes = mat_wann.num_hidden_nodes
         #self.hidden_dim = mat_wann.hidden_dim
         
-        self.activations = activations
-        self.activation_list = activation_list #output activation  
+        self.activation_list = activation_list
+        self.activation_list.insert(0, None) 
+        self.activation_output = activation_output #output activation  
+
         #self.constant_weight = constant_weight
         
         self.nodes = {}
@@ -301,138 +304,87 @@ class SparseNodeModel(nn.Module) :
     
     def concat_output(self) :
         for idx_output_node in list(range(self.out_dim)) :
+            
+            idx_output_node += (self.mat.shape[0] - self.out_dim)
 
-            if idx_output_node == 0 :
-                outputs = self.nodes['output_%d'%idx_output_node]
+            if idx_output_node == (self.mat.shape[0] - self.out_dim) : 
+                outputs = self.nodes['node_%d'%idx_output_node]
             else : 
-                outputs = torch.cat((outputs, self.nodes['output_%d'%idx_output_node]), 1)
+                outputs = torch.cat((outputs, self.nodes['node_%d'%idx_output_node]), 1)
         
-        return self.activation_list(outputs)
+        return self.activation_output(outputs)  
     
    
     def connect(self, x) : 
         # input layer와 모든 이전 hidden layer를 탐색
-        # 그렇지 않으면 skip connection을 놓칠수 있음
+        # 그렇지 않으면 skip connection을 놓칠수 있음 
         # 모든 node와 connection은 dictionary self.nodes에 저장
         #print(self.hidden_dim)
         hidden_node_counts = 0
         total_connection_counts = 0
         
-        
-        #hidden 노드가 없어도 이 코드가 돌아가도록  
-        if self.num_hidden_nodes == 0:  
-            
-            ## input이랑 output만 이어주기
-            for idx_output_row in range(self.mat.shape[0]): 
-                
-                connections_from_input = self.mat[idx_output_row,:]  
-                if connections_from_input.sum() != 0:  
-                    count_connection = 0 
-                    input_node = None
-                
-                    for idx_input_col, activation_type in enumerate(connections_from_input): 
-                        
-                        if activation_type != 0 and count_connection == 0:  
+
+        ## input이랑 output만 이어주기
+        for idx_output_row in range(self.mat.shape[0]): 
+
+            connections_from_input = self.mat[idx_output_row,:]  
+            if connections_from_input.sum() != 0:  
+                num_connection_from_previous = 0 
+                input_node = None 
+
+                for idx_input_col, activation_type in enumerate(connections_from_input): 
+                    if idx_output_row != idx_input_col:
+                    
+                        if activation_type != 0 and num_connection_from_previous == 0:  
                             layer = self.linears[total_connection_counts]
-                            input_node = node_activation(layer, 
-                                                         x[:, idx_input_col].view(-1,1), 
-                                                         activation_type         
-                                                         )  
-                            count_connection += 1
+                            if idx_input_col < self.in_dim:
+                                input_node = node_activation(layer, 
+                                                             x[:, idx_input_col].view(-1,1), 
+                                                             0,
+                                                             self.activation_list
+                                                             )  
+                            else:
+                                input_node = node_activation(layer,
+                                                             self.nodes['node_%d'%(idx_input_col)],
+                                                             0,
+                                                             self.activation_list)
+                            num_connection_from_previous += 1
                             total_connection_counts += 1
-                        elif activation_type != 0 and count_connection != 0 :   
+                        elif activation_type != 0 and num_connection_from_previous != 0 :   
                             new_node = None
-                            layer = self.linears[total_connection_counts]
-                            new_node = node_activation(layer, 
-                                                       x[:, idx_input_col].view(-1,1), 
-                                                       activation_type
-                                                       )  
-                            count_connection += 1
+                            layer = self.linears[total_connection_counts]  
+                            if idx_input_col < self.in_dim:
+                                new_node = node_activation(layer, 
+                                                             x[:, idx_input_col].view(-1,1), 
+                                                             0,
+                                                             self.activation_list
+                                                             )  
+                            else:
+                                new_node = node_activation(layer,
+                                                             self.nodes['node_%d'%(idx_input_col)],
+                                                             0,
+                                                             self.activation_list)  
+                            num_connection_from_previous += 1  
                             total_connection_counts += 1
-                            print("dd")
-                            print(input_node)
-                            print("cc")
-                            print(new_node)
+
                             if none_or_tensor(input_node) and node_or_tensor(new_node):       
                                 input_node = input_node + new_node    
-                 
-                
-                    self.nodes['output_%d'%(idx_output_row)] = self.activations[self.mat[idx_output_row, idx_output_row]](input_node)           
-                    
+
+                    print(idx_output_row)
+                    print(idx_input_col)
+                    print(input_node)
+                    print(self.activation_list)
+                    print(self.mat[idx_input_col, idx_input_col])  
+                  
+                    idx_activation = self.mat[idx_input_col, idx_input_col]  
+                    if idx_activation == 0:
+                        self.nodes['node_%d'%(idx_output_row)] = input_node
+                    else:
+                        self.nodes['node_%d'%(idx_output_row)] = self.activation_list[self.mat[idx_input_col, idx_input_col]](input_node)   
+
                 else : # connection이 없어도 ouput node는 존재해야 함. 그 값은 0
-                    self.nodes['output_%d'%(idx_output_row)] = torch.zeros((x.shape[0], 1), requires_grad=True)
-            
-            
-        
-        ############################### loop for hidden nodes + output nodes  
-        else:
-            
-            for idx_hidden_row in list(range(0, self.mat.shape[0])) :   
+                    self.nodes['node_%d'%(idx_output_row)] = torch.zeros((x.shape[0], 1), requires_grad=True)
 
-                connections_from_input = self.mat[idx_hidden_row, :]
-
-                if connections_from_input.sum() != 0 :  
-                    count_connection = 0   
-                    input_node = None   
-                    ############################# loop for input nodes
-                    for idx_input_col, activation_type in enumerate(connections_from_input) :
-
-                        if activation_type != 0 and count_connection == 0:
-                            # x[sample index, positional index for input]
-
-                            # 1) idx_input_col 이 input에서 오는 경우
-                            if idx_input_col < self.in_dim : 
-                                layer = self.linears[total_connection_counts]
-                                input_node = node_activation(layer, x[:, idx_input_col].view(-1, 1), 
-                                                             activation_type
-                                                             )
-                                total_connection_counts += 1
-                            # 2) idx_input_col이 hidden에서 오는 경우
-                            elif idx_input_col >= self.in_dim : 
-                                layer = self.linears[total_connection_counts]
-                                input_node = node_activation(layer, self.nodes['hidden_%d'%(idx_input_col-self.in_dim)],
-                                                             activation_type
-                                                             )
-                                total_connection_counts += 1
-
-                            #print(input_node)
-                            count_connection += 1
-                        elif activation_type != 0 and count_connection != 0 :
-                            # x[sample index, positional index for input]
-
-                            new_node = None
-                            # 1) idx_input_col 이 input에서 오는 경우
-                            if idx_input_col < self.in_dim : 
-                                layer = self.linears[total_connection_counts]
-                                new_node = node_activation(layer, x[:, idx_input_col].view(-1, 1), 
-                                                           activation_type   
-                                                           )
-                                total_connection_counts += 1
-                                
-                            # 2) idx_input_col이 hidden에서 오는 경우
-                            elif idx_input_col >= self.in_dim : 
-                                layer = self.linears[total_connection_counts]
-                                new_node = node_activation(layer, self.nodes['hidden_%d'%(idx_input_col-self.in_dim)],
-                                                           activation_type
-                                                           )
-                                total_connection_counts += 1
-                            if input_node != None and new_node != None:
-                                input_node = input_node + new_node
-
-                            count_connection += 1
-                            
-                    # connect all input nodes to given hidden node
-                    if idx_hidden_row < self.num_hidden_nodes : 
-                        self.nodes['hidden_%d'%idx_hidden_row] = self.activations[self.mat[idx_output_row, idx_output_row]](input_node)
-                    else : 
-                        self.nodes['output_%d'%(idx_hidden_row-self.num_hidden_nodes)] = self.activations[self.mat[idx_output_row, idx_output_row]](input_node)     
-                else : # connection이 없어도 ouput node는 존재해야 함. 그 값은 0
-                    if idx_hidden_row >= self.num_hidden_nodes : 
-                        self.nodes['output_%d'%(idx_hidden_row-self.num_hidden_nodes)] = torch.zeros((x.shape[0],1), requirs_grad=True) 
-            # sum all numbers of hidden nodes from this layer      
-            hidden_node_counts += 1     
-
-            
 
 
 
